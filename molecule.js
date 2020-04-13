@@ -3,7 +3,7 @@ class Molecule {
         this.position = createVector(random(radiusMax, width - radiusMax), random(radiusMax, height - radiusMax));
         this.velocity = createVector(random(-2, 2), random(-2, 2));
         this.arrayPosition = _i;
-        this.radius = random(radiusMin, radiusMax);
+        this.radius = (radiusMin, radiusMax);
         this.intersecting = false;
         this.bounce = false;
     }
@@ -114,13 +114,35 @@ class Molecule {
                 this.position.y += (dyNew / 2);
                 molecules[_indexValue].position.y -= (dyNew / 2);
 
-                
+                this.breakApart(_indexValue);
+
             }
+
             return true;    
+
         }
      
     }
-    
+    breakApart(_indexValue)
+    {
+
+        var tempVec = p5.Vector.sub(this.position,molecules[_indexValue].position);
+        var heading = tempVec.heading();
+        var moveDis = abs(tempVec.mag() - this.radius - molecules[_indexValue].radius);
+
+        var dis = dist(this.position.x,this.position.y,molecules[_indexValue].position.x,molecules[molecule].position.y);
+
+        var dx = Math.cos(heading) * (moveDis/2);
+
+        var dy = Math.sin(heading) * (moveDis/2);
+
+        this.position.x += dx;
+        this.position.y += dx;
+
+        molecules[_indexValue].position.x -= dy;
+        molecules[_indexValue].position.y -= dy;
+
+    }
 
 
     reset() {

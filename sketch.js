@@ -12,10 +12,8 @@ const lifeCycle = 10000;
 let percentOfInfected = 5;
 let rateOfInfection = 0.5;
 
+showLines = false;
 
-
-let showGrid = true;
-let showLines = false;
 
 let visualHeight = 150;
 let graphHeight = 100;
@@ -26,22 +24,15 @@ let graphWidth = 500;
 
 let gridMolecules = [];
 
-
 function setup() {
     createCanvas(1000, 1000);
     pixelDensity(1)
     background(127);
 
-    for (let i = 0; i < numOfMolecules; i++) {
-        let randomNum = random();
-        if(randomNum < percentOfInfected/100){
-            molecules.push(new Infector (i))
-        }else{
-            molecules.push(new Healthy(i));
-        }
-    }
-    gridifyBalls();
+    makeMolecules();
+    showGUI();
 
+    gridifyBalls();
 
     gridWidth = width / gridCols;
     gridHeight = (height - visualHeight) / gridRows;
@@ -55,14 +46,43 @@ function draw() {
     background(127);
     make2dArray();
     resetBalls();
-    
     splitIntoGrids();
     checkIntersections();
-    //drawGrid();
+    if (guiObj.drawGrid) drawGrid();
     renderGrid();
-    renderGraph();
+    if(guiObj.renderGraph) renderGraph();
+
 
 }
+
+var guiObj = {
+    numOfMolecules: 100,
+    drawGrid: true,
+    renderGraph: true
+
+  };
+function showGUI(){
+    let gui = new dat.GUI();
+    gui.domElement.id = "gui";
+    gui
+      .add(guiObj, "numOfMolecules", 0, 1000)
+      .onChange(() => makeMolecules())
+      .step(1);
+    gui.add(guiObj, "drawGrid");
+    gui.add(guiObj, "renderGraph");
+}
+
+function makeMolecules(){
+    for (let i = 0; i < guiObj.numOfMolecules; i++) {
+        let randomNum = random();
+        if(randomNum < percentOfInfected/100){
+            molecules.push(new Infector (i))
+        }else{
+            molecules.push(new Healthy(i));
+        }
+    }
+}
+
 
 function make2dArray() {
     gridMolecules = [];
@@ -99,7 +119,6 @@ function checkIntersections() {
 }
 
 function drawGrid() {
- if (showGrid){
     for (let i = 0; i < gridRows; i++) {
         for (let j = 0; j < gridCols; j++) {
             noFill();
@@ -135,7 +154,7 @@ function drawGrid() {
         }
     }
    
-}
+
 }
 
 function splitIntoGrids() {
@@ -274,9 +293,8 @@ function renderGrid() {
 
 
     molecules.forEach(function (molecule) {
-         molecule.step();
+        molecule.step();
         molecule.checkEdges();
-       
         molecule.render();
 
     });
